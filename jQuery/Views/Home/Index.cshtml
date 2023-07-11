@@ -1,0 +1,132 @@
+﻿@model Author
+@{
+    ViewData["Title"] = "Home Page";
+
+}
+
+<div class="container m-3">
+    <div class="row col-1">
+        <a class="btn btn-primary modal-btn" data-url="/Home/Create" data-title="Create Form" href="javascript:;">Create</a>
+    </div>
+</div>
+
+<div class="container m-3">
+    <table id="myTable" class="display">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Salary</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+@section Scripts
+    {
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable({
+                serverSide: true,
+                ajax: {
+                    url: '/Home/GetAll',
+                    type: 'POST',
+                },
+                order: [[0, 'asc']],
+                "language": {
+                    "searchPlaceholder": "Email and Name only..."
+                },
+                stateSave: true,
+                drawCallback: function () {
+                    $('#myTable').on('click', function () {
+                        $(document).ready(function () {
+                            $(".modal-btn").click(function () {
+                                var btn = $(this);
+                                var myModal = $("#Modal");
+
+                                $.ajax({
+                                    url: btn.data("url"),
+                                    method: "GET",
+                                    success: function (response) {
+                                        $(".modal-body").html(response);
+                                        $.validator.unobtrusive.parse(myModal);
+
+                                        myModal.find("#ModalLabel").text(btn.data("title"));
+                                        myModal.modal("show");
+                                    },
+                                    error: function () {
+                                        swal("Bad Request", "Your imaginary file is safe :)", "error");
+                                    }
+                                });
+
+                            });
+                        });
+                    });
+                    $('.dropdown-toggle').on('click', function () {
+                        $('.dropdown-toggle').dropdown('hide');
+                        $(this).dropdown('toggle');
+
+                        $(this).on('click', function () {
+                            $(this).dropdown('toggle');
+                        });
+
+                    });
+                    $('.deleteBtn').on('click', function () {
+                        var myBtn = $(this);
+
+                        swal({
+                            title: "Are you sure?",
+                            text: "You will not be able to recover this imaginary file!",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonClass: "btn-danger",
+                            confirmButtonText: "Yes, delete it!",
+                            cancelButtonText: "No, cancel plx!",
+                            closeOnConfirm: false,
+                            closeOnCancel: false
+                        },
+                            function (isConfirm) {
+                                if (isConfirm) {
+                                    $.ajax({
+                                        url: myBtn.data("url"),
+                                        method: "POST",
+                                        success: function () {
+                                            swal("Deleted!", "Your imaginary file has been deleted.", "success");
+                                        },
+                                        error: function () {
+                                            swal("Not Found", "Your imaginary file is safe :)", "error");     
+                                        }
+                                    });
+                                } else {
+                                    swal("Cancelled", "Your imaginary file is safe :)", "error");
+                                }
+                            });
+                    });
+
+                    //
+                },
+                columns: [
+                    { data: "email" },
+                    { data: "name" },
+                    { data: "salary" },
+                    {
+                        render: function (data, type, row) {
+                            var dropdown = '<div class="dropdown">';
+                            dropdown += ' <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button>';
+                            dropdown += '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
+                            dropdown += '<a class="dropdown-item modal-btn" data-url="/Home/Update/' + row.id + '" data-title="Update" href="#">Update</a>';
+                            dropdown += '<a class="dropdown-item deleteBtn" data-url="/Home/Delete/' + row.id + '" href="#">Delete</a>';
+                            dropdown += '</div>';
+                            dropdown += '</div>';
+                            return dropdown
+                        },
+                        orderable: false
+                    },
+                ]
+            });
+        });
+    </script>
+}
