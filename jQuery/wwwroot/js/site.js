@@ -19,7 +19,19 @@
 
 function onModalSuccess() {
     $("#Modal").modal("hide");
-    swal("Good job!", "You clicked the button!", "success");
+    swal({
+        title: "Good job!",
+        text: "You clicked the button!",
+        type: "success",
+        confirmButtonClass: "btn-primary",
+        confirmButtonText: "Ok",
+        closeOnConfirm: false,
+        closeOnCancel: false
+    }, function (isConfirm) {
+        if (isConfirm) {
+            location.reload();
+        }
+    });
 }
 
 function onModalFailure() {

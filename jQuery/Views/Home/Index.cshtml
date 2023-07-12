@@ -94,10 +94,17 @@
                                         url: myBtn.data("url"),
                                         method: "POST",
                                         success: function () {
-                                            swal("Deleted!", "Your imaginary file has been deleted.", "success");
+                                            swal({
+                                                title: "Deleted!", text: "Your imaginary file has been deleted.", type: "success",
+                                                confirmButtonClass: "btn-primary",confirmButtonText: "Ok",closeOnConfirm: false,closeOnCancel: false
+                                            }, function (isConfirm) {
+                                                if (isConfirm) {
+                                                    location.reload();
+                                                }
+                                            });
                                         },
                                         error: function () {
-                                            swal("Not Found", "Your imaginary file is safe :)", "error");     
+                                            swal("Not Found", "Your imaginary file is safe :)", "error");
                                         }
                                     });
                                 } else {
